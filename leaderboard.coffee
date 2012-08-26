@@ -22,6 +22,9 @@ reset_data = -> # Executes on both client and server.
   logs = [
     {name: 'Xiao', text: '欧铁页面有问题', created: new Date()},
     {name: 'Xiao', text: '欧铁页面影响到原APP页面', created: new Date()},
+    {name: 'Kent', text: '打赌投篮输给Tyr', created: new Date()},
+    {name: 'Iduu', text: '在灭零行动中主动申请一笔', created: new Date()},
+
   ]
   for item in names
     Players.insert
@@ -149,6 +152,7 @@ if Meteor.is_server
 
 if Meteor.is_client
   Meteor.startup ->
+    console.log Session.get 'username'
     if not Session.get 'username'
       name = prompt "请输入你的名字（用于发表评论）"
       Session.set 'username', name || '匿名傻孩子'
