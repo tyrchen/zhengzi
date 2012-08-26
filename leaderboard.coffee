@@ -14,16 +14,22 @@ reset_data = -> # Executes on both client and server.
     {name: 'Xiao', score: 9, icescream: 0},
     {name: 'Chiyuan', score: 3, icescream: 1},
     {name: 'Xintao', score: 2, icescream: 0},
-    {name: 'Hugh', score: 2, icescream: 0},
+    {name: 'Hugh', score: 1, icescream: 0},
     {name: 'Kent', score: 3, icescream: 0},
     {name: 'Brian', score: 2, icescream: 0},
     {name: 'Iduu', score: 1, icescream: 0}
   ]
   logs = [
-    {name: 'Xiao', text: '欧铁页面有问题', created: new Date()},
-    {name: 'Xiao', text: '欧铁页面影响到原APP页面', created: new Date()},
-    {name: 'Kent', text: '打赌投篮输给Tyr', created: new Date()},
-    {name: 'Iduu', text: '在灭零行动中主动申请一笔', created: new Date()},
+    {name: 'Xiao', text: '欧铁页面有问题', created: new Date('2012-8-24 19:00')},
+    {name: 'Xiao', text: '欧铁页面影响到原APP页面', created: new Date('2012-8-24 19:30')},
+    {name: 'Kent', text: '打赌投篮输给Tyr', created: new Date('2012-8-22')},
+    {name: 'Iduu', text: '在灭零行动中主动申请一笔', created: new Date('2012-8-24')},
+    {name: 'Jason', text: '佗佗很生气，后果很严重', created: new Date('2012-8-24')},
+    {name: 'Tyr', text: '不小心把水洒在地毯上被Brian鄙视', created: new Date('2012-8-23')},
+    {name: 'Hugh', text: '冰箱门没关严??', created: new Date('2012-8-20')},
+    {name: 'Brian', text: '碰坏楼上的网络', created: new Date('2012-8-14')},
+    {name: 'Chiyuan', text: '和Tyr打赌代码质量，结果输了', created: new Date('2012-8-23')},
+    {name: 'Xintao', text: '欧铁APP出现一大堆小问题', created: new Date('2012-8-23')}
 
   ]
   for item in names
@@ -98,6 +104,10 @@ if Meteor.is_client
 
 
   _.extend Template.player,
+    last_log: ->
+      log = Logs.findOne {name: @name}, {created: -1}
+      return log?.text
+
     events:
       'click .increment': ->
         $('#' + @name).modal()
