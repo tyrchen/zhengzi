@@ -1,8 +1,38 @@
+html, body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
 body {
   /* Offset the container below the topbar */
   padding-top: 60px;
 }
 
+.container-fluid {
+  width: 100%;
+  height: 100%;
+}
+
+.row-fluid.info {
+  width: 100%;
+  height: 100%;
+  > div {
+    height: 100%;
+    > .logs {
+      height: 50%;
+      overflow-y: scroll;
+    }
+    > .chat {
+      height: 50%;
+      overflow-y: scroll;
+    }
+  }
+}
+.row-fluid.chat {
+  widows: 100%;
+  height: 30%;
+}
 /*
 .navbar {
   width: 440px;
@@ -25,3 +55,8 @@ body {
 .logs {
   h3 {display: inline; margin: 5px;}
 }
+
+textarea { width: 95%;}
+
+
+
