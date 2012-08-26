@@ -116,7 +116,7 @@ if Meteor.is_client
       'click .log-cancel': ->
         $('#' + @name).modal('hide')
 
-      'click .icescream': ->
+      'click .buy-icescream': ->
         if @score < 5
           return alert '别着急，你还没到兑现雪糕的时候'
         Logs.insert
