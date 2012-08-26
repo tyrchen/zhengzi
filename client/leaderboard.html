@@ -1,5 +1,6 @@
 <head>
-  <title>Leaderboard</title>
+  <meta charset="utf-8">
+  <title>正字系统</title>
   <link rel="shortcut icon" href="/img/favicon.ico">
 </head>
 
@@ -11,56 +12,114 @@
       </div>
     </div>
   </div>
-  <div class="container">
+  <div class="container-fluid">
     {{> leaderboard}}
   </div>
+
+  <div class="modal" id="about" tabindex="-1" role="dialog" style="display: none;">
+    <div class="modal-header">
+      <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+      <h3 id="myModalLabel">关于正字系统</h3>
+    </div>
+    <div class="modal-body">
+      <p>正字系统没有用户验证，所以...</p>
+      <p>做人要厚道，请自觉维护正字系统</p>
+      <p>犯错误自己加一笔</p>
+      <p>兑现雪糕后自己点兑现雪糕，会减一个正字</p>
+      <p>使用meteor node.js framework + mongodb完成，支持live update，每个人的浏览器都自动更新</p>
+      <p>代码只有50行</p>
+    </div>
+  </div>
+
+
+
 </body>
 
 <template name="navbar">
-        <a class="brand" href="#">Leaderboard</a>
+        <a class="brand" href="#">途客圈正字系统</a>
         <ul class="nav">
           <li class="dropdown">
-            <a href="#" class="dropdown-toggle" data-toggle="dropdown">Actions<b class="caret"></b></a>
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown">排序<b class="caret"></b></a>
             <ul class="dropdown-menu">
-              <li class="sort_by_name"><a href="#">Sort by Name</a></li>
-              <li><a class="sort_by_score" href="#">Sort by Score</a></li>
+              <li class="sort_by_name"><a href="#">按名称排序</a></li>
+              <li><a class="sort_by_score" href="#">按正字排序</a></li>
               <li class="divider"></li>
               <li class="reset_data"><a href="#">Reset Data</a></li>
             </ul>
           </li>
-          <li><a href="https://github.com/srackham/leaderboard-coffeescript">Github</a></li>
-          <li><a href="http://meteor.com/examples/leaderboard">About</a></li>
+          <li><a href="#about" role="button" data-toggle="modal">关于</a></li>
         </ul>
 </template>
 
 <template name="leaderboard">
-  <div class="input-append">
-    <input id="player_name" type="text" placeholder="New player"/>
-    <button id="add_button" class="btn" type="button">Add Player</button>
+  <div class="row-fluid">
+    <div class="span8">
+      <div class="input-append">
+        <input id="player_name" type="text" placeholder="输入新成员的名字"/>
+        <button id="add_button" class="btn" type="button">添加成员</button>
+      </div>
+
+      <table class="table table-striped players">
+        <thead>
+          <tr>
+            <th>名字</th>
+            <th>正字</th>
+            <th style="width: 20px"></th>
+            <th style="width: 20px"></th>
+          </tr>
+        </thead>
+        <tbody>
+        {{#each players}}
+          {{> player}}
+        {{/each}}
+        </tbody>
+      </table>
+    </div>
+    <div class="span4">
+      <table class="table table-stripped logs">
+        <thead>
+          <tr><td colspan='3'><h3>正字日志</h3><a class="btn btn-small view-all-log">查看所有</a></td></tr>
+        </thead>
+        <tbody>
+        {{#each logs}}
+          {{> log}}
+        {{/each}}
+        </tbody>
+      </table>
+    </div>
   </div>
-  <table class="table table-striped">
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Score</th>
-        <th style="width: 20px"></th>
-        <th style="width: 20px"></th>
-      </tr>
-    </thead>
-    <tbody>
-    {{#each players}}
-      {{> player}}
-    {{/each}}
-    </tbody>
-  </table>
 </template>
 
 <template name="player">
   <tr class="player">
     <td class="name">{{name}}</td>
     <td class="score">{{score}}</td>
-    <td><i class="increment icon-plus" rel="tooltip" data-original-title="Add five points to the score"></i></td>
-    <td><i class="remove icon-remove" rel="tooltip" data-original-title="Delete player"></i></td>
+    <td>
+      <i class="increment icon-plus" rel="tooltip" data-original-title="为正字添加一笔"></i>
+      <div class="modal hide fade" id="{{name}}">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+          <h3>这个可怜的{{name}}犯了神马过错？</h3>
+        </div>
+        <div class="modal-body">
+          <textarea></textarea>
+        </div>
+        <div class="modal-footer">
+          <a href="#" class="btn log-cancel">取消，{{name}}没犯错</a>
+          <a href="#" class="btn btn-primary log-increment">狠狠地给{{name}}加一笔，雪糕就在眼前</a>
+        </div>
+      </div>
+    </td>
+    <td><i class="icescream icon-fire" rel="tooltip" data-original-title="兑现雪糕"></i></td>
+    <!--<td><i class="remove icon-remove" rel="tooltip" data-original-title="删除成员"></i></td>-->
   </tr>
   {{enable_tooltips}}
+</template>
+
+<template name="log">
+  <tr class="log">
+    <td class="time">{{formatted_time}}</td>
+    <td class="name">{{name}}</td>
+    <td class="text">{{text}}</td>
+  </tr>
 </template>
