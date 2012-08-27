@@ -105,13 +105,18 @@ if Meteor.is_client
 
   _.extend Template.player,
     last_log: ->
-      log = Logs.findOne {name: @name}, {created: -1}
-      return log?.text
+      log = Logs.find {name: @name}, sort: {created: -1}
+      return log.fetch()[0]?.text
 
     events:
       'click .increment': ->
         $('#' + @name).modal()
-
+      'click .decrement': ->
+        Logs.insert
+          name: @name
+          text: '管理员对上一笔正字很不满意，故而减之'
+        Players.update @_id, $inc: {score:-1}
+        
       'click .log-increment': ->
         text = $('#' + @name + ' textarea')
         return if not text.val()
