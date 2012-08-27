@@ -1,6 +1,7 @@
 Players = new Meteor.Collection 'players'
 Logs = new Meteor.Collection 'logs'
 Comments = new Meteor.Collection 'comments'
+spinner = null
 
 reset_data = -> # Executes on both client and server.
   Players.remove {}
@@ -9,15 +10,15 @@ reset_data = -> # Executes on both client and server.
   Session.set 'username', ''
 
   names = [
-    {name: 'Tyr', score: 2, icescream: 1},
-    {name: 'Jason', score: 10, icescream: 0},
-    {name: 'Xiao', score: 9, icescream: 0},
-    {name: 'Chiyuan', score: 3, icescream: 1},
-    {name: 'Xintao', score: 2, icescream: 0},
-    {name: 'Hugh', score: 1, icescream: 0},
-    {name: 'Kent', score: 3, icescream: 0},
-    {name: 'Brian', score: 2, icescream: 0},
-    {name: 'Iduu', score: 1, icescream: 0}
+    {name: 'Tyr', score: 2, icescream: 1, group: '开发'},
+    {name: 'Jason', score: 10, icescream: 0, group: '开发'},
+    {name: 'Xiao', score: 9, icescream: 0, group: '开发'},
+    {name: 'Chiyuan', score: 3, icescream: 1, group: '开发'},
+    {name: 'Xintao', score: 2, icescream: 0, group: '开发'},
+    {name: 'Hugh', score: 1, icescream: 0, group: '开发'},
+    {name: 'Kent', score: 3, icescream: 0, group: '开发'},
+    {name: 'Brian', score: 2, icescream: 0, group: '开发'},
+    {name: 'Iduu', score: 1, icescream: 0, group: '开发'}
   ]
   logs = [
     {name: 'Xiao', text: '欧铁页面有问题', created: new Date('2012-8-24 19:00')},
@@ -37,12 +38,16 @@ reset_data = -> # Executes on both client and server.
       name: item.name
       score: item.score
       icescream: item.icescream
+      group: item.group
 
   for item in logs
     Logs.insert
       name: item.name
       text: item.text
       created: item.created
+
+init_group = ->
+  Players.update group: null, $set: group: '开发'
 
 if Meteor.is_client
 
@@ -54,17 +59,31 @@ if Meteor.is_client
       'click .reset_data': -> reset_data()
 
   _.extend Template.leaderboard,
+    onReady: ->
+      Meteor.defer ->
+        delay = (ms, func) -> Meteor.setTimeout func, ms
+        delay 2000, ->
+          spinner.stop()
+          if not Session.get 'username'
+            name = prompt "请输入你的名字（用于发表评论）"
+            Session.set 'username', name || '匿名傻孩子'
+
     players: ->
       switch Session.get('sort')
         when 0 then sort = name: 1
         when 1 then sort = score: -1
         when 2 then sort = icescream: -1
 
-      Players.find {}, sort: sort
+      query = {}
+      group = Session.get 'selected_group'
+      if group
+        query = group: group
+
+      Players.find query, sort: sort
 
     logs: ->
       sort = created: -1
-      name = Session.get('selected_name')
+      name = Session.get 'selected_name'
       query = {}
       if name
         query = name: name
@@ -82,14 +101,23 @@ if Meteor.is_client
       'click #add_button, keyup #player_name': (evt) ->
         return if evt.type is 'keyup' and evt.which isnt 13 # Key is not Enter.
         input = $('#player_name')
+        group = Session.get 'selected_group' || '开发'
         if input.val()
           Players.insert
             name: input.val()
             score: 0
+            icescream: 0
+            group: group
           input.val ''
 
+      'click #player-group .btn': (evt) ->
+        # TODO: meteor breaks bootstrap js from being toggled
+        Meteor.setTimeout (-> Session.set 'selected_group', $(evt.target).data('name')), 200
+
+
+
       'click .view-all-log': ->
-        Session.set('selected_name', '')
+        Session.set 'selected_name', ''
 
       'click #add_comment_button, keyup #comment': (evt) ->
         return if evt.type is 'keyup' and evt.which isnt 13 # Key is not Enter.
@@ -165,10 +193,8 @@ if Meteor.is_client
 if Meteor.is_server
   Meteor.startup ->
     reset_data() if Players.find().count() is 0
+    init_group() if Players.find({group: null}).count isnt 0
 
 if Meteor.is_client
   Meteor.startup ->
-    console.log Session.get 'username'
-    if not Session.get 'username'
-      name = prompt "请输入你的名字（用于发表评论）"
-      Session.set 'username', name || '匿名傻孩子'
+    spinner = new Spinner().spin(document.getElementsByTagName('body')[0])
