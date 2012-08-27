@@ -61,12 +61,12 @@ if Meteor.is_client
   _.extend Template.leaderboard,
     onReady: ->
       Meteor.defer ->
-        delay = (ms, func) -> Meteor.setTimeout func, ms
-        delay 2000, ->
-          spinner.stop()
-          if not Session.get 'username'
-            name = prompt "请输入你的名字（用于发表评论）"
-            Session.set 'username', name || '匿名傻孩子'
+        #delay = (ms, func) -> Meteor.setTimeout func, ms
+        #delay 4000, ->
+        spinner.stop()
+        if not Session.get 'username'
+          name = prompt "请输入你的名字（用于发表评论）"
+          Session.set 'username', name || '匿名傻孩子'
 
     players: ->
       switch Session.get('sort')
@@ -74,10 +74,7 @@ if Meteor.is_client
         when 1 then sort = score: -1
         when 2 then sort = icescream: -1
 
-      query = {}
-      group = Session.get 'selected_group'
-      if group
-        query = group: group
+      query = group: Session.get('selected_group') || '开发'
 
       Players.find query, sort: sort
 
@@ -97,17 +94,26 @@ if Meteor.is_client
     username: ->
       Session.get 'username'
 
+    group: ->
+      Session.get('selected_group') || '开发'
+
     events:
       'click #add_button, keyup #player_name': (evt) ->
         return if evt.type is 'keyup' and evt.which isnt 13 # Key is not Enter.
         input = $('#player_name')
-        group = Session.get 'selected_group' || '开发'
+        group = Session.get('selected_group') || '开发'
         if input.val()
           Players.insert
             name: input.val()
             score: 0
             icescream: 0
             group: group
+
+          Logs.insert
+            name: input.val()
+            text: '欢迎新童鞋进入正字地狱，我们的宗旨是：没有最差，只有更差；来了你就别想走'
+            created: new Date()
+
           input.val ''
 
       'click #player-group .btn': (evt) ->
