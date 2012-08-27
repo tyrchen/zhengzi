@@ -115,8 +115,9 @@ if Meteor.is_client
         Logs.insert
           name: @name
           text: '管理员对上一笔正字很不满意，故而减之'
+          created: new Date()
         Players.update @_id, $inc: {score:-1}
-        
+
       'click .log-increment': ->
         text = $('#' + @name + ' textarea')
         return if not text.val()
